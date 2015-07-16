@@ -38,9 +38,11 @@ void setup() {
 void loop() {
   // Read analog and store samples
   value = analogRead(FSR);
-  Serial.print(value);Serial.print(" ");Serial.println(threshold);
   samples[avgIndex++] = value;
   if(avgIndex >= AVERAGE) avgIndex = 0;
+  
+  // Debugging
+  // Serial.print(value);Serial.print(" ");Serial.println(threshold);
   
   // Averaging over samples
   total = 0;
