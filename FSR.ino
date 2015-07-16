@@ -1,7 +1,7 @@
 // Test 3 FSRs in parallel and getting their input in analog in
 
 #define VERSION 1
-#define LED 12
+#define LED 13
 #define FSR A0
 #define AVERAGE 8
 
@@ -32,12 +32,13 @@ void setup() {
     samples[i] = value;
     total += samples[i];
   }
-  threshold = total / AVERAGE;
+  threshold = (total / AVERAGE)*0.95;
 }
 
 void loop() {
   // Read analog and store samples
   value = analogRead(FSR);
+  Serial.print(value);Serial.print(" ");Serial.println(threshold);
   samples[avgIndex++] = value;
   if(avgIndex >= AVERAGE) avgIndex = 0;
   
