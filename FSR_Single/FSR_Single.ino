@@ -4,6 +4,7 @@
 #define LED 13
 #define FSR A0
 #define AVERAGE 8
+#define THRESHOLD 0.92
 
 int samples[AVERAGE];
 int avgIndex = 0;
@@ -32,7 +33,7 @@ void setup() {
     samples[i] = value;
     total += samples[i];
   }
-  threshold = (total / AVERAGE)*0.95;
+  threshold = (total / AVERAGE) * THRESHOLD;
 }
 
 void loop() {

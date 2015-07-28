@@ -1,33 +1,14 @@
-// Pin layout copied from pins.arduino.h for convience, and then added how the pins are
-// connected on the circuit board.
-//
-// ATMEL ATTINY861
-//
-//                             +-\/-+
-// MOSI           (D  9) PB0  1|    |20  PA0 (D  0)           FSR1
-// MISO          *(D  8) PB1  2|    |19  PA1 (D  1)           FSR2
-// SCK            (D  7) PB2  3|    |18  PA2 (D  2) INT1      FSR3
-// NC/IO3        *(D  6) PB3  4|    |17  PA3 (D 14)
-//                       VCC  5|    |16  AGND
-//                       GND  6|    |15  AVCC
-// SN1/IO2        (D  5) PB4  7|    |14  PA4 (D 10)           LED4
-// SN2/IO1       *(D  4) PB5  8|    |13  PA5 (D 11)           LED3
-// SIG       INT0 (D  3) PB6  9|    |12  PA6 (D 12)           LED2
-// RST            (D 15) PB7 10|    |11  PA7 (D 13)           LED1
-//                             +----+
-//
-
 #define VERSION     1
 
 // Define the pins that have LEDs on them. We have one LED for each of the three FSRs to indicate
 // when each FSR is triggered. And one power/end stop LED that is on until any of the FSRs are
 // triggered.
-#define LED1        13
-#define LED2        12
+#define LED1        9
+#define LED2        10
 #define LED3        11
 
-#define LEDTRIGGER  10
-#define ENDSTOP     3
+#define LEDTRIGGER  13
+#define ENDSTOP     12
 
 // Define the pins used for the analog inputs that have the FSRs attached. These have external
 // 10K pull-up resistors.
@@ -46,6 +27,7 @@
 //   0       1          0.85
 //   1       0          0.95
 //   1       1          0.92
+const float thresholds[] = { 0.80, 0.85, 0.95, 0.92 };
 
 short fsrLeds[] = { LED1, LED2, LED3 };     // Pins for each of the LEDs next to the FSR inputs
 short fsrPins[] = { FSR1, FSR2, FSR3 };     // Pins for each of the FSR analog inputs
@@ -80,10 +62,9 @@ void SetOutput(short fsr, bool state)
         any |= triggered[fsr];
     }
 
-    digitalWrite(LEDTRIGGER, any ? LOW : HIGH);
-
-    // For the end stop
+    digitalWrite(LEDTRIGGER, any ? HIGH : LOW);
     digitalWrite(ENDSTOP, any ? LOW : HIGH);
+
 }
 
 void InitValues()
@@ -190,7 +171,7 @@ uint16_t UpdateLongSamples(short fsr, int avg)
 //
 inline float GetThreshold()
 {
-    return 0.95;
+    return 0.85;
 }
 
 //
@@ -208,9 +189,7 @@ void CheckIfTriggered(short fsr)
         total += shortSamples[fsr][i];
     }
     uint16_t avg = total / SHORT_SIZE;
-
     uint16_t longAverage = UpdateLongSamples(fsr, avg);
-
     uint16_t threshold = GetThreshold() * longAverage;
 
     bool triggered = avg < threshold;
